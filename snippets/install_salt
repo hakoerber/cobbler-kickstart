@@ -1,3 +1,4 @@
 curl -o /root/install_salt.sh "http://$server:$http_port/cobbler/aux/install_salt.sh"
 
 sh /root/install_salt.sh -X stable
+systemctl disable salt-minion
