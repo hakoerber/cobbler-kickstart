@@ -1,0 +1,23 @@
+%packages --excludedocs
+@Core --nodefaults
+-NetworkManager
+-NetworkManager-libnm
+-NetworkManager-team
+-NetworkManager-tui
+-firewalld
+-alsa-firmware
+-alsa-lib
+-alsa-tools-firmware
+-avahi-libs
+-avahi-autoipd
+-dnsmasq
+-mariadb-libs
+-ncurses
+-ncurses-base
+-ncurses-libs
+-sqlite
+-postfix
+-kexec-tools
+-rsyslog
+rsyslog7
+%end

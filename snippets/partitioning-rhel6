@@ -1,0 +1,13 @@
+# use hostname as vg name
+#set basevg = $getVar('hostname', 'centos').split('.',1)[0].replace('-', '_')
+
+clearpart --drives=vda
+
+part /boot --ondrive=vda --size 250 --fstype=ext4 --label=boot
+part pv.01 --ondrive=vda --size 1 --grow
+
+volgroup $basevg pv.01
+
+logvol /    --vgname=$basevg --name=root --size=3000 --fstype=ext4
+logvol /var --vgname=$basevg --name=var  --size=1000 --fstype=xfs --grow
+logvol swap --vgname=$basevg --name=swap --size=250

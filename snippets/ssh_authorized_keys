@@ -2,8 +2,10 @@
 
 mkdir --parents --mode 700 /root/.ssh
 
-cat > /root/.ssh/authorized_keys << EOF 
+cat > /root/.ssh/authorized_keys << EOF
 $authorized_key
 EOF
 
 chmod 600 /root/.ssh/authorized_keys
+
+#sshkey --username=root "$authorized_key"
