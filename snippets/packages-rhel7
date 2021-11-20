@@ -1,4 +1,4 @@
-%packages --excludedocs
+%packages --excludedocs --nobase
 @Core --nodefaults
 -NetworkManager
 -NetworkManager-libnm

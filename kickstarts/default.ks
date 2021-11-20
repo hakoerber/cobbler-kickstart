@@ -1,6 +1,6 @@
 # AUTHENTICATION AND USERS
-auth --enableshadow --enablemd5
-rootpw --iscrypted $default_password_crypted
+auth --enableshadow --passalgo=sha512
+rootpw --iscrypted $6$faf5E6GpQxbdKpzN$AO2t6EwrzvolXwCcjDzgLZXmYoznzhbt7HsKCCBnp0326DDZlqNVgKIGMoTffeWb7FaIv.NBsQl6BgSj5kMHC0
 
 # FIREWALL
 firewall --disabled
@@ -17,28 +17,33 @@ install
 skipx
 text
 poweroff
-url --url=$tree
+
+services --disabled=firewalld
 
 # PARTITIONS
-bootloader --location=mbr --password=grub
+zerombr
+
+bootloader --location=mbr
 clearpart --all --initlabel
-$SNIPPET("custom/partitioning-" + $os_version)
 
-# NETWORK
-$SNIPPET('network_config')
+part raid.01 --size=512 --ondisk=sda
+part raid.02 --size=512 --ondisk=sdb
 
-%pre --log=/root/ks-pre.log
-$SNIPPET('log_ks_pre')
-$SNIPPET('kickstart_start')
-$SNIPPET('pre_install_network_config')
-%end
+part raid.11 --ondisk=sda --grow
+part raid.12 --ondisk=sdb --grow
 
-$SNIPPET("custom/packages-" + $os_version)
+raid /boot --level=1 --device=md0 --fstype=xfs raid.01 raid.02
+raid pv.01 --level=1 --device=md1 raid.11 raid.12
 
-%post --log=/root/ks-post.log
-$SNIPPET('log_ks_post')
-$SNIPPET('custom/ssh_authorized_keys')
-$SNIPPET('custom/install_salt')
-$SNIPPET('custom/cleanup')
-$SNIPPET('kickstart_done')
+volgroup vg.hyper01 pv.01
+
+logvol /    --vgname=vg.hyper01 --name=root --size=5120 --fstype=xfs
+logvol /var --vgname=vg.hyper01 --name=var  --size=4096 --fstype=xfs
+logvol swap --vgname=vg.hyper01 --name=swap --size=1024 --fstype=xfs
+
+user --name hannes
+sshkey --username=hannes "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKEEo9Wz5PAsT1YNvd4U7MTIIKDor+bssx0ySk9UhsMcqi7YoRrSGHhNYf14VTts/eRaSV/RrsTVvnitKalhWSwPMdQsFTgXZnwIGHVqMoIMoIqZYhM7xm+yTJkHc0cWtRhQkfnj1Iy7k0yt2cQ6ETM2RkxIrYCW9jh2E56yv25cozcXOl+xfJCmUtCTWGA8rP9H1x7Y6I3+kCrJ66O1m/Qm2yhk3+tyBwwOsgLXGz3iQYrKtGM5LWYqFfQ49LYcusC71SfI3NubyG82lit/g3keeBjOIa9hSeamBnaUuKxodPV/N9N35vnMcz5wSVHKpEGvh+8rA3BrHBu2+YtZdL hannes"
+
+%packages --nobase
+@Core --nodefaults
 %end
